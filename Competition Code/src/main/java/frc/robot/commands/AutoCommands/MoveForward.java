@@ -36,9 +36,6 @@ public class MoveForward extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (swerve.reachedPosition(d, d, d, d)){
-      return true;
-    }
-    return false;
+    return swerve.reachedPosition(d, d, d, d);
   }
 }

@@ -19,7 +19,7 @@ public class SwerveRotaters extends SubsystemBase {
   /** These are the variables that are created for this subsytem.. */
   private WPI_TalonFX fRRotater, fLRotater, bLRotater, bRRotater;
   public final double ENCODER_PULSES_PER_ROTATION = 2048;
-  public final double ROTATION_POW = 45;
+  public final double ROTATION_POW = 25;
   public boolean swerveSwitch;
 
   // This is the constructor where the rotater motors are created (named encoders) and are reset.
@@ -142,7 +142,7 @@ public class SwerveRotaters extends SubsystemBase {
     // of the robot, which is the 0 point of the encoders. 
     if (angle>=yaw) angle -= yaw;
     else angle = 360 - (yaw-angle); 
-    return (angle);
+    return (angle%360);
   }
 
   public double getAngle(double horizontal, double vertical, double yaw){
@@ -181,6 +181,7 @@ public class SwerveRotaters extends SubsystemBase {
       }
       else if (isRotating && isTranslating){
         //zone 1
+        System.out.println(angle);
         if(((angle>=0)&&(45>angle))||((360>angle)&&(angle>=315))){
           fRRotater.set(ControlMode.Position, ((angle-rotationHorizontal*ROTATION_POW)%360)*(ENCODER_PULSES_PER_ROTATION*GEAR_RATIO)/360);
           fLRotater.set(ControlMode.Position, ((angle-rotationHorizontal*ROTATION_POW)%360)*(ENCODER_PULSES_PER_ROTATION*GEAR_RATIO)/360);

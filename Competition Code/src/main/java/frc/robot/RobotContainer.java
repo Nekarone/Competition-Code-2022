@@ -29,7 +29,8 @@ import static frc.robot.Constants.*;
 public class RobotContainer {
 
   // JOYSTICKS
-  public final Joystick shopper = new Joystick(CONTROLLER_0);
+  public final Joystick shopper = new Joystick(DRIVER_CONTROLLER);
+  public final Joystick operator = new Joystick(OPERATOR_CONTROLLER);
 
   // SUBSYSTEMS
 
@@ -37,21 +38,23 @@ public class RobotContainer {
   public final SwerveSpinners SWERVESPINNERS = new SwerveSpinners();
   public final SwerveRotaters SWERVEROTATERS = new SwerveRotaters();
   public final Gyro GYRO = new Gyro();
-    //Mechanism Subs
-  public final Sheeesh SHEEESH = new Sheeesh();
+  
+  //Mechanism Subs
   public final RollerIntake ROLLERINTAKE = new RollerIntake();
-  public final Shooter YEETER = new Shooter();
+  public final Catapult YEETER = new Catapult();
 
   // BUTTONS
   public final JoystickButton modeSwitchButton = new JoystickButton(shopper, DRIVESWITCHBUTTON);
-  public final JoystickButton intakeButton = new JoystickButton(shopper, INTAKE_BUTTON),
-  outtakeButton = new JoystickButton(shopper, OUTTAKE_BUTTON);
-  public final JoystickButton shootButton = new JoystickButton(shopper, SHOOT_BUTTON);
+  public final JoystickButton intakeButton = new JoystickButton(shopper, INTAKE_BUTTON);
+  public final JoystickButton outtakeButton = new JoystickButton(shopper, OUTTAKE_BUTTON);
+  public final JoystickButton lowerCatapultButton = new JoystickButton(operator, LOWERCATAPULT_BUTTON);
+  public final JoystickButton releaseCatapultButton = new JoystickButton(operator, RELEASECATAPULT_BUTTON);
   public final InstantCommand modeSwitchRotaters = new InstantCommand(() -> SWERVEROTATERS.toggleSwitch(), SWERVEROTATERS);
   public final InstantCommand modeSwitchTrans = new InstantCommand(()-> SWERVESPINNERS.toggleSwitch(), SWERVESPINNERS);
   public final Command intakeCommand = new IntakeCommand(ROLLERINTAKE);
   public final Command outtakeCommand = new OuttakeCommand(ROLLERINTAKE);
-  public final Command shootCommand = new ShootCommand(YEETER);
+  public final Command releaseCatapultCommand = new ReleaseCatapultCommand(YEETER);
+  public final Command lowerCatapultCommand = new LowerCatapultCommand(YEETER);
   
   
   public RobotContainer() {
@@ -71,32 +74,41 @@ public class RobotContainer {
     SWERVEROTATERS.setDefaultCommand(
       new RunCommand(
         () -> SWERVEROTATERS.rotateMotors(shopper.getRawAxis(TRANSLATIONAL_HORIZONTAL_AXIS),
-        shopper.getRawAxis(TRANSLATIONAL_VERTICAL_AXIS), shopper.getRawAxis(ROTATIONAL_HORIZONTAL_AXIS), GYRO.getYaw()),
-        SWERVEROTATERS
+                                          shopper.getRawAxis(TRANSLATIONAL_VERTICAL_AXIS), 
+                                          shopper.getRawAxis(ROTATIONAL_HORIZONTAL_AXIS), 
+                                          GYRO.getYaw()),
+              SWERVEROTATERS
     ));
     SWERVESPINNERS.setDefaultCommand(
       new RunCommand(
         () -> SWERVESPINNERS.spinMotors(shopper.getRawAxis(TRANSLATIONAL_HORIZONTAL_AXIS),
-        shopper.getRawAxis(TRANSLATIONAL_VERTICAL_AXIS),
-        shopper.getRawAxis(ROTATIONAL_HORIZONTAL_AXIS),
-        SWERVEROTATERS.getAngle(shopper.getRawAxis(TRANSLATIONAL_HORIZONTAL_AXIS), shopper.getRawAxis(TRANSLATIONAL_VERTICAL_AXIS), GYRO.getYaw())),
-        SWERVESPINNERS
+                                        shopper.getRawAxis(TRANSLATIONAL_VERTICAL_AXIS),
+                                        shopper.getRawAxis(ROTATIONAL_HORIZONTAL_AXIS),
+              SWERVEROTATERS.getAngle(shopper.getRawAxis(TRANSLATIONAL_HORIZONTAL_AXIS), 
+                                      shopper.getRawAxis(TRANSLATIONAL_VERTICAL_AXIS), 
+                                      GYRO.getYaw())),
+              SWERVESPINNERS
     ));
     GYRO.setDefaultCommand(
       new RunCommand(
         () -> GYRO.getState(),
-        GYRO
+              GYRO
     ));
 
     //Intake
-    intakeButton.whileHeld(new IntakeCommand(ROLLERINTAKE));
-    outtakeButton.whileHeld(new OuttakeCommand(ROLLERINTAKE));
+    intakeButton.whileHeld(intakeCommand);
+    outtakeButton.whileHeld(outtakeCommand);
 
     //Shooter
-    shootButton.whenPressed(new ShootCommand(YEETER));
+    releaseCatapultButton.whenPressed(releaseCatapultCommand);
+    lowerCatapultButton.whenHeld(lowerCatapultCommand);
 
     //Switching Tank and Swerve
     modeSwitchButton.whenPressed(modeSwitchRotaters);
     modeSwitchButton.whenPressed(modeSwitchTrans);
+
+    
+
+
   }
 }
